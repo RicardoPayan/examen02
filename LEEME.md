@@ -1,6 +1,6 @@
 # IMP: Un lenguaje de programación simple e imperativo
 
-Los programas de computadora suelen ser representados en memoria como
+Los programas de computadora suelen ser representados en memoria como aaa
 árboles (llamados árboles de sintaxis). Utilizar esta estructura
 permite manipular, transformar y ejecutar programas de manera mas
 sencilla a que en su representación textual (como aparecen en el
