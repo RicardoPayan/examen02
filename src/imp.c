@@ -1,4 +1,5 @@
 #include <imp.h>
+#include <memoryadd.h>
 
 /***************************/
 /* EXPRESIONES ARITMÉTICAS */
@@ -277,7 +278,7 @@ bool bexp_eval(bexp_t *b) {
     return bexp_eval(bexp_bleft(b)) || bexp_eval(bexp_bright(b));
 }
 /***************************/
-/* EXPRESIONES             */
+/*        EXPRESIONES      */
 /***************************/
 typedef enum {
     PEXP_SKP,
@@ -288,154 +289,158 @@ typedef enum {
 } PEXP_TYPE;
 
 typedef struct pexp_t {
-    PEXP_TYPE test;
+    PEXP_TYPE type;
     union {
-        struct {
+        struct { //ASS
             struct aexp_t *index;
             struct aexp_t *rvalue;
         };
-        struct{
+        struct{//SEQ
             struct pexp_t *pfirst;
             struct pexp_t *psecond;
         };
-        struct{
+        struct{ //WHILE
             struct bexp_t *condition;
             struct pexp_t *ptrue;
             struct pexp_t *pfalse;
         };
+        struct {//IF
+            struct bexp_t piftrue;
+            struct bexp_t pifalse;
+        };
+        
     };
 } pexp_t;
 
-//Predicados
-bool pexp_is_skip(pexp_t *f) {
-    return f->test == PEXP_SKP;
+//PREDICADOS
+bool pexp_is_skip(pexp_t *p) {
+    return p->type == PEXP_SKP;
 }
 
-bool pexp_is_ass(pexp_t *f) {
-    return f->test == PEXP_ASS;
+bool pexp_is_ass(pexp_t *p) {
+    return p->type == PEXP_ASS;
 }
 
-bool pexp_is_seq(pexp_t *f) {
-    return f->test == PEXP_SEQ;
+bool pexp_is_seq(pexp_t *p) {
+    return p->type == PEXP_SEQ;
 }
 
-bool pexp_is_while(pexp_t *f) {
-    return f->test == PEXP_WHL;
+bool pexp_is_while(pexp_t *p) {
+    return p->type == PEXP_WHL;
 }
 
-bool pexp_is_if(pexp_t *f) {
-    return f->test == PEXP_IF;
+bool pexp_is_if(pexp_t *p) {
+    return p->type == PEXP_IF;
 }
 
-//Selectores
+//SELECTORES
 
-aexp_t *pexp_aindex(pexp_t *f){
-    if (f->test!=PEXP_ASS) return NULL;
-    return f->index;
+aexp_t *pexp_aindex(pexp_t *p){
+    if (p->type!=PEXP_ASS) return NULL;
+    return p->index;
 }
-aexp_t *pexp_arvalue(pexp_t *f){
-    if (f->test!=PEXP_ASS) return NULL;
-    return f->rvalue;
+aexp_t *pexp_arvalue(pexp_t *p){
+    if (p->type!=PEXP_ASS) return NULL;
+    return p->rvalue;
 }
-pexp_t *pexp_pfirst(pexp_t *f){
-    if (f->test!=PEXP_SEQ) return NULL;
-    return f->pfirst;
+pexp_t *pexp_pfirst(pexp_t *p){
+    if (p->type!=PEXP_SEQ) return NULL;
+    return p->pfirst;
 }
-pexp_t *pexp_psecond(pexp_t *f){
-    if (f->test!=PEXP_SEQ) return NULL;
-    return f->psecond;
-}
-
-bexp_t *pexp_bcondition(pexp_t *f){
-    if (f->test!=PEXP_WHL&&f->test!=PEXP_IF) return NULL;
-    return f->condition;
-}
-pexp_t *pexp_ptrue(pexp_t *f){
-    if (f->test!=PEXP_WHL&&f->test!=PEXP_IF) return NULL;
-    return f->ptrue;
-}
-pexp_t *pexp_pfalse(pexp_t *f){
-    if (f->test!=PEXP_IF) return NULL;
-    return f->pfalse;
+pexp_t *pexp_psecond(pexp_t *p){
+    if (p->type!=PEXP_SEQ) return NULL;
+    return p->psecond;
 }
 
-//Constructores
+bexp_t *pexp_bcondition(pexp_t *p){
+    if (p->type!=PEXP_WHL&&p->type!=PEXP_IF) return NULL;
+    return p->condition;
+}
+pexp_t *pexp_ptrue(pexp_t *p){
+    if (p->type!=PEXP_WHL&&p->type!=PEXP_IF) return NULL;
+    return p->ptrue;
+}
+pexp_t *pexp_pfalse(pexp_t *p){
+    if (p->type!=PEXP_IF) return NULL;
+    return p->pfalse;
+}
+
+//CONSTRUCTORES
 pexp_t *pexp_make_skip() {
-    pexp_t *f = (pexp_t *)malloc(sizeof(pexp_t));
-    if (f == NULL) return NULL;
-    f->test = PEXP_SKP;
-    return f;
+    pexp_t *p = (pexp_t *)malloc(sizeof(pexp_t));
+    if (p == NULL) return NULL;
+    p->type = PEXP_SKP;
+    return p;
 }
 
 pexp_t *pexp_make_assign(aexp_t *index, aexp_t *rvalue) {
-    pexp_t *f = (pexp_t *)malloc(sizeof(pexp_t));
-    if (f == NULL) return NULL;
-    f->test = PEXP_ASS;
-    f->index = index;
-    f->rvalue = rvalue;
-    return f;
+    pexp_t *p = (pexp_t *)malloc(sizeof(pexp_t));
+    if (p == NULL) return NULL;
+    p->type = PEXP_ASS;
+    p->index = index;
+    p->rvalue = rvalue;
+    return p;
 }
 
 pexp_t *pexp_make_sequence(pexp_t *pfirst, pexp_t *psecond) {
-    pexp_t *f = (pexp_t *)malloc(sizeof(pexp_t));
-    if (f == NULL) return NULL;
-    f->test = PEXP_SEQ;
-    f->pfirst = pfirst;
-    f->psecond = psecond;
-    return f;
+    pexp_t *p = (pexp_t *)malloc(sizeof(pexp_t));
+    if (p == NULL) return NULL;
+    p->type = PEXP_SEQ;
+    p->pfirst = pfirst;
+    p->psecond = psecond;
+    return p;
 }
 
 pexp_t *pexp_make_cicle(bexp_t *condition, pexp_t *ptrue) {
-    pexp_t *f = (pexp_t *)malloc(sizeof(pexp_t));
-    if (f == NULL) return NULL;
-    f->test = PEXP_WHL;
-    f->condition = condition;
-    f->ptrue = ptrue;
-    return f;
+    pexp_t *p = (pexp_t *)malloc(sizeof(pexp_t));
+    if (p == NULL) return NULL;
+    p->type = PEXP_WHL;
+    p->condition = condition;
+    p->ptrue = ptrue;
+    return p;
 }
 
 pexp_t *pexp_make_conditional(bexp_t *condition, pexp_t *ptrue, pexp_t *pfalse) {
-    pexp_t *f = (pexp_t *)malloc(sizeof(pexp_t));
-    if (f == NULL) return NULL;
-    f->test = PEXP_IF;
-    f->condition = condition;
-    f->ptrue = ptrue;
-    f->pfalse = pfalse;
-    return f;
+    pexp_t *p = (pexp_t *)malloc(sizeof(pexp_t));
+    if (p == NULL) return NULL;
+    p->type = PEXP_IF;
+    p->condition = condition;
+    p->ptrue = ptrue;
+    p->pfalse = pfalse;
+    return p;
 }
 
-void pexp_free(pexp_t *f) {
-    if (f == NULL) return;
+void pexp_free(pexp_t *p) {
+    if (p == NULL) return;
 
-    if (pexp_is_sequence(f)) {
-        pexp_free(pexp_pfirst(f));
-        pexp_free(pexp_psecond(f));
-        free(f);
+    if (pexp_is_sequence(p)) {
+        pexp_free(pexp_pfirst(p));
+        pexp_free(pexp_psecond(p));
+        free(p);
         return;
     }
 
-    if (pexp_is_assign(f)) {
-        aexp_free(pexp_arvalue(f));
-        aexp_free(pexp_aindex(f));
-        free(f);
+    if (pexp_is_assign(p)) {
+        aexp_free(pexp_arvalue(p));
+        aexp_free(pexp_aindex(p));
+        free(p);
         return;
     }
 
-    if (pexp_is_conditional(f)) {
-        bexp_free(pexp_bcondition(f));
-        pexp_free(pexp_ptrue(f));
-        pexp_free(pexp_pfalse(f));
-        free(f);
+    if (pexp_is_conditional(p)) {
+        bexp_free(pexp_bcondition(p));
+        pexp_free(pexp_ptrue(p));
+        pexp_free(pexp_pfalse(p));
+        free(p);
         return;
     }
     
-    if (pexp_is_while(f)) {
-        bexp_free(pexp_bcondition(f));
-        pexp_free(pexp_ptrue(f));
-        free(f);
+    if (pexp_is_while(p)) {
+        bexp_free(pexp_bcondition(p));
+        pexp_free(pexp_ptrue(p));
+        free(p);
         return;
     }
 
-    free(f);
+    free(p);
 }
-//f
