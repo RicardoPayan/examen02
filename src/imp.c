@@ -285,7 +285,7 @@ typedef enum {
     PEXP_ASS,
     PEXP_SEQ,
     PEXP_WHL,
-    PEXP_IF,
+    PEXP_IFS,
 } PEXP_TYPE;
 
 typedef struct pexp_t {
@@ -302,11 +302,11 @@ typedef struct pexp_t {
         struct{ //WHILE
             struct bexp_t *condition;
             struct pexp_t *ptrue;
-            struct pexp_t *pfalse;
         };
         struct {//IF
-            struct bexp_t piftrue;
-            struct bexp_t pifalse;
+            struct bexp_t *conditional;
+            struct pexp_t *iftrue;
+            struct pexp_t *ifelse;
         };
         
     };
@@ -330,7 +330,7 @@ bool pexp_is_while(pexp_t *p) {
 }
 
 bool pexp_is_if(pexp_t *p) {
-    return p->type == PEXP_IF;
+    return p->type == PEXP_IFS;
 }
 
 //SELECTORES
@@ -353,16 +353,26 @@ pexp_t *pexp_psecond(pexp_t *p){
 }
 
 bexp_t *pexp_bcondition(pexp_t *p){
-    if (p->type!=PEXP_WHL&&p->type!=PEXP_IF) return NULL;
+    if (p->type!=PEXP_WHL&&p->type!=PEXP_IFS) return NULL;
     return p->condition;
 }
 pexp_t *pexp_ptrue(pexp_t *p){
-    if (p->type!=PEXP_WHL&&p->type!=PEXP_IF) return NULL;
+    if (p->type!=PEXP_WHL) return NULL;
     return p->ptrue;
 }
-pexp_t *pexp_pfalse(pexp_t *p){
-    if (p->type!=PEXP_IF) return NULL;
-    return p->pfalse;
+
+pexp_t *pexp_iftrue(pexp_t *p){
+    if(p->type!=PEXP_IFS)return NULL;
+    return p->iftrue;
+}
+pexp_t *pexp_ifelse(pexp_t *p){
+    if(p->type!=PEXP_IFS)return NULL;
+    return p->ifelse;
+}
+
+bexp_t *pexp_bconditional(pexp_t *p){
+    if (p->type!=PEXP_IFS) return NULL;
+    return p->conditional;
 }
 
 //CONSTRUCTORES
@@ -400,34 +410,61 @@ pexp_t *pexp_make_cicle(bexp_t *condition, pexp_t *ptrue) {
     return p;
 }
 
-pexp_t *pexp_make_conditional(bexp_t *condition, pexp_t *ptrue, pexp_t *pfalse) {
+pexp_t *pexp_make_if(bexp_t *conditional, pexp_t *iftrue, pexp_t *ifelse) {
     pexp_t *p = (pexp_t *)malloc(sizeof(pexp_t));
     if (p == NULL) return NULL;
-    p->type = PEXP_IF;
-    p->condition = condition;
-    p->ptrue = ptrue;
-    p->pfalse = pfalse;
+    p->type = PEXP_IFS;
+    p->conditional = conditional;
+    p->iftrue = iftrue;
+    p->ifelse = ifelse;
     return p;
+}
+
+//EVALUADOR
+//falta la memoria ahi lol
+void peval(pexp_t *p){
+    if (pexp_is_ass(p)){
+        //FUNCION QUE ASIGNA MEMO
+    }
+    if(pexp_is_seq(p))
+    {
+        peval(pexp_pfirst(p));
+        peval(pexp_psecond(p));
+
+    }
+    if(pexp_is_while(p))
+    {
+        while(bexp_eval(pexp_bcondition(p))) {
+            peval(pexp_ptrue(p));
+        }
+    }
+    if(pexp_is_if(p)){
+        if(bexp_eval(pexp_bconditional(p)))
+            peval(pexp_iftrue(p));
+        else
+            peval(pexp_ifelse(p));
+    }
+
 }
 
 void pexp_free(pexp_t *p) {
     if (p == NULL) return;
 
-    if (pexp_is_sequence(p)) {
+    if (pexp_is_seq(p)) {
         pexp_free(pexp_pfirst(p));
         pexp_free(pexp_psecond(p));
         free(p);
         return;
     }
 
-    if (pexp_is_assign(p)) {
+    if (pexp_is_ass(p)) {
         aexp_free(pexp_arvalue(p));
         aexp_free(pexp_aindex(p));
         free(p);
         return;
     }
 
-    if (pexp_is_conditional(p)) {
+    if (pexp_is_if(p)) {
         bexp_free(pexp_bcondition(p));
         pexp_free(pexp_ptrue(p));
         pexp_free(pexp_pfalse(p));

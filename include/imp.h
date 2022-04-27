@@ -69,8 +69,8 @@ void aexp_free(aexp_t *a);
 /*
   Evaluador de expresiones aritméticas.
  */
-uint64_t aexp_eval(aexp_t *a, mem_t* m);
-
+//uint64_t aexp_eval(aexp_t *a, mem_t* m);
+uint64_t aexp_eval(aexp_t *a);
 /*************************/
 /* EXPRESIONES BOOLEANAS */
 /*************************/
@@ -136,8 +136,8 @@ void bexp_free(bexp_t *b);
  * @param b Expresión booleana por evaluar.
  * @return bool Valor de verdad de la expresión. 
  */
-bool bexp_eval(bexp_t *b, mem_t* m);
-
+//bool bexp_eval(bexp_t *b, mem_t* m);
+bool bexp_eval(bexp_t *b);
 
 /***************************/
 /* EXPRESIONES DE PROGRAMA */
@@ -156,10 +156,10 @@ typedef struct pexp_t pexp_t;
   predicados.
  */
 bool pexp_is_skip(pexp_t *p);
-bool pexp_is_assign(pexp_t *p);
-bool pexp_is_sequence(pexp_t *p) ;
+bool pexp_is_ass(pexp_t *p);
+bool pexp_is_seq(pexp_t *p) ;
 bool pexp_is_while(pexp_t *p);
-bool pexp_is_conditional(pexp_t *p);
+bool pexp_is_if(pexp_t *p);
 
 /*
   Los siguientes constructores permiten crear una expresion de Programa a partir de
@@ -187,11 +187,14 @@ pexp_t *pexp_pfirst(pexp_t *p);
 bexp_t *pexp_bcondition(pexp_t *p);
 pexp_t *pexp_ptrue(pexp_t *p);
 pexp_t *pexp_pfalse(pexp_t *p);
-
+pexp_t *pexp_iftrue(pexp_t *p);
+pexp_t *pexp_ifelse(pexp_t *p);
+bexp_t *pexp_bconditional(pexp_t *p);
 // Destructor
 void pexp_free(pexp_t *p);
 
 //Evaluador
-bool pexp_eval(pexp_t *p, mem_t* m);
+//falta la memoria
+void peval(pexp_t *p);
 
 #endif  /* ED_IMP_H_ */
