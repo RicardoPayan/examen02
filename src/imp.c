@@ -1,6 +1,5 @@
-#include <imp.h>
 #include <memoryadd.h>
-
+#include <imp.h>
 /***************************/
 /* EXPRESIONES ARITMÉTICAS */
 /***************************/
@@ -10,6 +9,7 @@ typedef enum {
     AEXP_ADD,
     AEXP_SUB,
     AEXP_MUL,
+    AEXP_MEM,
 } AEXP_TYPE;
 
 typedef struct aexp_t {
@@ -20,6 +20,7 @@ typedef struct aexp_t {
             struct aexp_t *left;
             struct aexp_t *right;
         };
+        aexp_t* index;
     };
 } aexp_t;
 
@@ -38,7 +39,12 @@ bool aexp_is_sub(aexp_t *a) {
 bool aexp_is_mul(aexp_t *a) {
     return a->type == AEXP_MUL;
 }
-
+bool aexp_is_mem(aexp_t *a) {
+    return a->type == AEXP_MEM;
+}
+aexp_t *aexp_index(aexp_t *a) {
+    return a->index;
+}
 uint64_t aexp_num(aexp_t *a) {
     return a->num;
 }
@@ -56,6 +62,13 @@ aexp_t *aexp_make_num(uint64_t num) {
     if (a == NULL) return NULL;
     a->type = AEXP_NUM;
     a->num = num;
+    return a;
+}
+aexp_t *aexp_make_mem(aexp_t* index) {
+    aexp_t *a = (aexp_t *)malloc(sizeof(aexp_t));
+    if (a == NULL) return NULL;
+    a->type = AEXP_MEM;
+    a->index = index;
     return a;
 }
 
@@ -96,17 +109,18 @@ void aexp_free(aexp_t *a) {
     free(a);
 }
 
-uint64_t aexp_eval(aexp_t *a) {
+uint64_t aexp_eval(aexp_t *a, mem_t* m) {
     if (aexp_is_num(a)) return aexp_num(a);
+    if (aexp_is_mem(a)) return mem_eval(m, a->index);
 
-    uint64_t nleft = aexp_eval(aexp_left(a));
-    uint64_t nright = aexp_eval(aexp_right(a));
+    uint64_t nleft = aexp_eval(aexp_left(a), m);
+    uint64_t nright = aexp_eval(aexp_right(a), m);
 
     if (aexp_is_add(a)) return nleft + nright;
     if (aexp_is_mul(a)) return nleft * nright;
 
     if (nright > nleft) return 0;
-    return nleft - nright;
+        return nleft - nright;
 }
 
 /*************************/
@@ -260,22 +274,22 @@ void bexp_free(bexp_t *b) {
     free(b);
 }
 
-bool bexp_eval(bexp_t *b) {
+bool bexp_eval(bexp_t *b, mem_t* m) {
     if (bexp_is_true(b)) return true;
     if (bexp_is_false(b)) return false;
 
-    if (bexp_is_neg(b)) return !bexp_eval(bexp_nchild(b));
+    if (bexp_is_neg(b)) return !bexp_eval(bexp_nchild(b), m);
 
     if (bexp_is_equal(b))
-        return aexp_eval(bexp_aleft(b)) == aexp_eval(bexp_aright(b));
+        return aexp_eval(bexp_aleft(b), m) == aexp_eval(bexp_aright(b), m);
 
     if (bexp_is_less(b))
-        return aexp_eval(bexp_aleft(b)) < aexp_eval(bexp_aright(b));
+        return aexp_eval(bexp_aleft(b), m) < aexp_eval(bexp_aright(b), m);
 
     if (bexp_is_and(b))
-        return bexp_eval(bexp_bleft(b)) && bexp_eval(bexp_bright(b));
+        return bexp_eval(bexp_bleft(b), m) && bexp_eval(bexp_bright(b), m);
 
-    return bexp_eval(bexp_bleft(b)) || bexp_eval(bexp_bright(b));
+    return bexp_eval(bexp_bleft(b), m) || bexp_eval(bexp_bright(b), m);
 }
 /***************************/
 /*        EXPRESIONES      */
@@ -401,7 +415,7 @@ pexp_t *pexp_make_sequence(pexp_t *pfirst, pexp_t *psecond) {
     return p;
 }
 
-pexp_t *pexp_make_cicle(bexp_t *condition, pexp_t *ptrue) {
+pexp_t *pexp_make_while(bexp_t *condition, pexp_t *ptrue) {
     pexp_t *p = (pexp_t *)malloc(sizeof(pexp_t));
     if (p == NULL) return NULL;
     p->type = PEXP_WHL;
@@ -422,28 +436,31 @@ pexp_t *pexp_make_if(bexp_t *conditional, pexp_t *iftrue, pexp_t *ifelse) {
 
 //EVALUADOR
 //falta la memoria ahi lol
-void peval(pexp_t *p){
+bool peval (pexp_t *p, mem_t* m)
+{
     if (pexp_is_ass(p)){
         //FUNCION QUE ASIGNA MEMO
+        if (mem_assign(m, pexp_aindex(p), pexp_arvalue(p)) == NULL) return false;
     }
     if(pexp_is_seq(p))
     {
-        peval(pexp_pfirst(p));
-        peval(pexp_psecond(p));
+        peval(pexp_pfirst(p),m);
+        peval(pexp_psecond(p),m);
 
     }
     if(pexp_is_while(p))
     {
-        while(bexp_eval(pexp_bcondition(p))) {
-            peval(pexp_ptrue(p));
+        while(bexp_eval(pexp_bcondition(p),m)) {
+            peval(pexp_ptrue(p),m);
         }
     }
     if(pexp_is_if(p)){
-        if(bexp_eval(pexp_bconditional(p)))
-            peval(pexp_iftrue(p));
+        if(bexp_eval(pexp_bconditional(p),m))
+            peval(pexp_iftrue(p),m);
         else
-            peval(pexp_ifelse(p));
+            peval(pexp_ifelse(p),m);
     }
+    return true;
 
 }
 
@@ -465,9 +482,9 @@ void pexp_free(pexp_t *p) {
     }
 
     if (pexp_is_if(p)) {
-        bexp_free(pexp_bcondition(p));
-        pexp_free(pexp_ptrue(p));
-        pexp_free(pexp_pfalse(p));
+        bexp_free(pexp_bconditional(p));
+        pexp_free(pexp_iftrue(p));
+        pexp_free(pexp_ifelse(p));
         free(p);
         return;
     }

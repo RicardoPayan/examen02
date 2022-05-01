@@ -69,8 +69,7 @@ void aexp_free(aexp_t *a);
 /*
   Evaluador de expresiones aritméticas.
  */
-//uint64_t aexp_eval(aexp_t *a, mem_t* m);
-uint64_t aexp_eval(aexp_t *a);
+uint64_t aexp_eval(aexp_t *a, mem_t* m);
 /*************************/
 /* EXPRESIONES BOOLEANAS */
 /*************************/
@@ -136,8 +135,7 @@ void bexp_free(bexp_t *b);
  * @param b Expresión booleana por evaluar.
  * @return bool Valor de verdad de la expresión. 
  */
-//bool bexp_eval(bexp_t *b, mem_t* m);
-bool bexp_eval(bexp_t *b);
+bool bexp_eval(bexp_t *b, mem_t* m);
 
 /***************************/
 /* EXPRESIONES DE PROGRAMA */
@@ -168,8 +166,8 @@ bool pexp_is_if(pexp_t *p);
 pexp_t *pexp_make_skip();
 pexp_t *pexp_make_assign(aexp_t *index, aexp_t *rvalue);
 pexp_t *pexp_make_sequence(pexp_t *pfirst, pexp_t *psecond);
-pexp_t *pexp_make_cicle(bexp_t *condition, pexp_t *ptrue);
-pexp_t *pexp_make_conditional(bexp_t *condition, pexp_t *ptrue, pexp_t *pfalse);
+pexp_t *pexp_make_while(bexp_t *condition, pexp_t *ptrue);
+pexp_t *pexp_make_if(bexp_t *conditional, pexp_t *iftrue, pexp_t *ifelse);
 
 
 /*
@@ -195,6 +193,6 @@ void pexp_free(pexp_t *p);
 
 //Evaluador
 //falta la memoria
-void peval(pexp_t *p);
+bool peval(pexp_t *p, mem_t* m);
 
 #endif  /* ED_IMP_H_ */

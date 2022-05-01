@@ -15,18 +15,7 @@ bool a_make_num() {
     return false;
 }
 
-bool a_make_mem() {
-    aexp_t *a = aexp_make_mem(aexp_make_num(666));
-    check(a != NULL, "Esperaba suficiente memoria");
-    check(aexp_is_mem(a), "Esperaba expresión de memoria");
-    check(aexp_eval(aexp_index(a), NULL) == 666, "Valor numérico no esperado");
-    aexp_free(a);
-    return true;
 
- fail:
-    aexp_free(a);
-    return false;
-}
 
 bool a_make_add() {
     aexp_t *a = aexp_make_add(aexp_make_num(42),
@@ -501,7 +490,7 @@ bool p_make_assign(){
     pexp_t *p=pexp_make_assign(aexp_make_num(2),
                                 aexp_make_num(3));
     check(p!=NULL, "Expected enough memory");
-    check(pexp_is_assign(p), "Expected skip type"); 
+    check(pexp_is_ass(p), "Expected skip type"); 
     check(pexp_aindex(p)!=NULL, "Expected enough memory + assignation on left pointer");
     check(pexp_arvalue(p)!=NULL, "Expected enough memory + assignation on right pointer");
     check(aexp_is_num(pexp_aindex(p)), "Expected numeric type on left");
@@ -518,7 +507,7 @@ bool p_make_sequence(){
     pexp_t *p=pexp_make_sequence(pexp_make_skip(),
                                 pexp_make_skip());
     check(p!=NULL, "Expected enough memory");
-    check(pexp_is_sequence(p), "Expected sequence type"); 
+    check(pexp_is_seq(p), "Expected sequence type"); 
     check(pexp_pfirst(p)!=NULL, "Expected enough memory + assignation on left pointer");
     check(pexp_psecond(p)!=NULL, "Expected enough memory + assignation on right pointer");
     check(pexp_is_skip(pexp_pfirst(p)), "Expected skip type on left");
@@ -532,7 +521,7 @@ fail:
 bool p_make_while(){
     bexp_t* tru = bexp_make_true();
     bexp_t* or = bexp_make_or(tru, tru);
-    pexp_t *p=pexp_make_cicle(or,
+    pexp_t *p=pexp_make_while(or,
                                 pexp_make_skip());
     check(p!=NULL, "Expected enough memory");
     check(pexp_is_while(p), "Expected while type"); 
@@ -546,19 +535,19 @@ fail:
     pexp_free(p);
     return false;
 }
-bool p_make_conditional(){
+bool p_make_if(){
     bexp_t* tru = bexp_make_true();
     bexp_t* or = bexp_make_or(tru, tru);
-    pexp_t *p = pexp_make_conditional(or,
+    pexp_t *p = pexp_make_if(or,
                                         pexp_make_skip(), pexp_make_skip());
     check(p!=NULL, "Expected enough memory");
-    check(pexp_is_conditional(p), "Expected skip type"); 
-    check(pexp_bcondition(p)!=NULL, "Expected enough memory + assignation on left pointer");
-    check(pexp_ptrue(p)!=NULL, "Expected enough memory + assignation on mid pointer")
-    check(pexp_pfalse(p)!=NULL, "Expected enough memory + assignation on right pointer");
-    check(bexp_is_or(pexp_bcondition(p)), "Expected or type on left");
-    check(pexp_is_skip(pexp_ptrue(p)), "Expected skip type on right");
-    check(pexp_is_skip(pexp_pfalse(p)), "Expected skip type on mid");
+    check(pexp_is_if(p), "Expected skip type"); 
+    check(pexp_bconditional(p)!=NULL, "Expected enough memory + assignation on left pointer");
+    check(pexp_iftrue(p)!=NULL, "Expected enough memory + assignation on mid pointer")
+    check(pexp_ifelse(p)!=NULL, "Expected enough memory + assignation on right pointer");
+    check(bexp_is_or(pexp_bconditional(p)), "Expected or type on left");
+    check(pexp_is_skip(pexp_iftrue(p)), "Expected skip type on right");
+    check(pexp_is_skip(pexp_ifelse(p)), "Expected skip type on mid");
     pexp_free(p);
     return true;
 fail:
@@ -623,95 +612,17 @@ fail:
     return false;
 }
 
-pexp_t* factorial() {
-    pexp_t* fact = pexp_make_sequence(
-        pexp_make_assign(aexp_make_num(0), aexp_make_num(1)),
-        pexp_make_cicle(bexp_make_less(aexp_make_mem(aexp_make_num(2)), 
-            aexp_make_mem(aexp_make_num(1))),
-            pexp_make_sequence(
-                pexp_make_assign(aexp_make_num(2), aexp_make_add(aexp_make_mem(aexp_make_num(2)), aexp_make_num(1))),
-                pexp_make_assign(aexp_make_num(0), aexp_make_mul(aexp_make_mem(aexp_make_num(0)), aexp_make_mem(aexp_make_num(2))))
-            )
-        )
-    );   
-
-    return fact;
-}
-
-//PROBANDO EVALUADOR DE PROGRAMA
-bool p_eval() {
-
-    aexp_t* result = aexp_make_mem(aexp_make_num(0));
-    pexp_t* fact = factorial();
-
-    aexp_t* n = aexp_make_num(7);
-    aexp_t* input = aexp_make_num(1);
-
-    pexp_t* factorial_5 = pexp_make_sequence(
-        pexp_make_assign(aexp_make_num(0), aexp_make_num(1)),
-        pexp_make_cicle(bexp_make_less(aexp_make_mem(aexp_make_num(1)), 
-            aexp_make_num(5)),
-            pexp_make_sequence(
-                pexp_make_assign(aexp_make_num(1), aexp_make_add(aexp_make_mem(aexp_make_num(1)), aexp_make_num(1))),
-                pexp_make_assign(aexp_make_num(0), aexp_make_mul(aexp_make_mem(aexp_make_num(0)), aexp_make_mem(aexp_make_num(1))))
-            )
-        )
-    );
-
-    mem_t* m = mem_make();
-
-    check(m != NULL, "Mem shouldn't be NULL");
-    check(pexp_eval(factorial_5, m), "Evaluation of program should be succesful.");
-    check(aexp_eval(result, m) == 120, "Result should be equal to 120.");
-
-    mem_assign(m, input, n); 
-    check(pexp_eval(fact, m), "Should have succesful evaluation.");
-    check(aexp_eval(result, m) == 5040, "Result of 7! should be 5040.");
-
-    uint64_t test_fact = 1;
-    for (uint64_t i = 1; i <= 2; ++i) {
-        test_fact *= i;
-        aexp_free(n);
-        mem_free(m);
-        m = mem_make();
-        n = aexp_make_num(i);
-        mem_assign(m, input, n);
-
-        check(pexp_eval(fact, m), "Should have succesful evaluation.");
-        check(aexp_eval(result, m) == test_fact, "Result isn't right.");
-    } 
-
-    aexp_free(result);
-    pexp_free(factorial_5);
-    mem_free(m);
-    aexp_free(n);
-    aexp_free(input);
-    pexp_free(fact);
-
-    return true;
-fail:
-    aexp_free(result);
-    pexp_free(factorial_5);
-    mem_free(m);
-    aexp_free(n);
-    aexp_free(input);
-    pexp_free(fact);
-    return false;
-}
-
 int main() {
-    fprintf(stderr, "- Probando expresiones aritméticas\n");
+    fprintf(stderr, "==|PROBANDO EXPRESIONES ARITMETICAS|==\n");
     run_test(a_make_num);
-    run_test(a_make_mem);
     run_test(a_make_add);
     run_test(a_make_sub);
     run_test(a_make_mul);
     run_test(a_eval_num);
-    run_test(a_eval_mem);
     run_test(a_eval_add);
     run_test(a_eval_sub);
     run_test(a_eval_mul);
-    fprintf(stderr, "- Probando expresiones booleanas\n");
+    fprintf(stderr, "==|PROBANDO EXPRESIONES BOOLEANAS|==\n");
     run_test(b_make_truefalse);
     run_test(b_make_equal);
     run_test(b_make_less);
@@ -724,14 +635,12 @@ int main() {
     run_test(b_eval_and);
     run_test(b_eval_or);
     run_test(b_eval_neg);
-    fprintf(stderr, "- Probando memoria\n");
+    fprintf(stderr, "==|SE PRUEBA MEMORIA|==\n");
     run_test(test_mem_assign_and_eval);
-    fprintf(stderr, "- Probando expresiones de P\n");
+    fprintf(stderr, "==|PROBANDO EXPRESIONES DE PROGRAMA|==\n");
     run_test(p_make_skip);
     run_test(p_make_assign);
     run_test(p_make_sequence);
     run_test(p_make_while);
-    run_test(p_make_conditional);
-    run_test(p_eval);
-    
+    run_test(p_make_if);
 }
