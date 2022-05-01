@@ -6,7 +6,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sun May  1 13:50:00 2022
+# Make data base, printed on Sun May  1 14:35:05 2022
 
 # Variables
 
@@ -29,7 +29,7 @@ VSCODE_LOG_NATIVE = false
 # automatic
 @F = $(notdir $@)
 # makefile
-CURDIR := /home/fhermin/examen02
+CURDIR := /home/fhermin/examen02-1
 # makefile
 SHELL = /bin/sh
 # environment
@@ -59,7 +59,7 @@ PATH = /home/fhermin/.vscode-server/bin/dfd34e8260c270da74b5c2d86d61aee4b6d56977
 # environment
 VSCODE_LOG_STACK = false
 # environment
-VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-93184db6-afcd-40b9-95ae-4a319e942f25.sock
+VSCODE_IPC_HOOK_CLI = /tmp/vscode-ipc-a4418b4d-bf1d-4e68-95ec-1dd2c4ab6a1e.sock
 # default
 .FEATURES := target-specific order-only second-expansion else-if shortest-stem undefine oneshell archives jobserver output-sync check-symlink load
 # environment
@@ -71,11 +71,11 @@ SRCDIR = src
 # environment
 VSCODE_PIPE_LOGGING = true
 # environment
-PWD = /home/fhermin/examen02
+PWD = /home/fhermin/examen02-1
 # default
 .LOADED := 
 # environment
-WSL_INTEROP = /run/WSL/8_interop
+WSL_INTEROP = /run/WSL/11279_interop
 # environment
 VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
@@ -154,10 +154,8 @@ TERM = xterm-256color
 VSCODE_EXTHOST_WILL_SEND_SOCKET = true
 # environment
 WSL_DISTRO_NAME = Ubuntu
-# environment
-MOTD_SHOWN = update-motd
 # variable set hash-table stats:
-# Load=73/1024=7%, Rehash=0, Collisions=4/109=4%
+# Load=72/1024=7%, Rehash=0, Collisions=4/112=4%
 
 # Pattern-specific Variable Values
 
@@ -165,8 +163,8 @@ MOTD_SHOWN = update-motd
 
 # Directories
 
-# . (device 2064, inode 51989): 10 files, no impossibilities.
-# src (device 2064, inode 52223): 1 files, no impossibilities so far.
+# . (device 2064, inode 52505): 10 files, no impossibilities.
+# src (device 2064, inode 57250): 1 files, no impossibilities so far.
 
 # 11 files, no impossibilities in 2 directories.
 
@@ -184,7 +182,7 @@ src/%.o: src/%.c
 src/imp.o: src/imp.c include/imp.h
 #  Implicit rule search has been done.
 #  Implicit/static pattern stem: 'imp'
-#  Last modified 2022-05-01 13:49:40.2036206
+#  Last modified 2022-05-01 14:34:45.5636206
 #  File has been updated.
 #  Successfully updated.
 #  recipe to execute (from 'Makefile', line 25):
@@ -198,7 +196,7 @@ all: test-imp
 #  File has been updated.
 #  Needs to be updated (-q is set).
 # variable set hash-table stats:
-# Load=0/32=0%, Rehash=0, Collisions=0/3=0%
+# Load=0/32=0%, Rehash=0, Collisions=0/7=0%
 
 # Not a target:
 .SUFFIXES:
@@ -209,28 +207,28 @@ all: test-imp
 # Not a target:
 test/imp.c:
 #  Implicit rule search has been done.
-#  Last modified 2022-05-01 13:49:40.2036206
+#  Last modified 2022-05-01 14:34:45.5636206
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-05-01 13:49:40.1936206
+#  Last modified 2022-05-01 14:34:45.5636206
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 include/imp.h:
 #  Implicit rule search has been done.
-#  Last modified 2022-05-01 13:49:40.1936206
+#  Last modified 2022-05-01 14:34:45.5636206
 #  File has been updated.
 #  Successfully updated.
 
 # Not a target:
 src/imp.c:
 #  Implicit rule search has been done.
-#  Last modified 2022-05-01 13:49:40.1936206
+#  Last modified 2022-05-01 14:34:45.5636206
 #  File has been updated.
 #  Successfully updated.
 
@@ -249,38 +247,40 @@ clean:
 
 test/imp.o: test/imp.c src/imp.o
 #  Implicit rule search has not been done.
-#  Last modified 2022-05-01 13:49:40.2036206
+#  Implicit/static pattern stem: ''
+#  File does not exist.
 #  File has been updated.
-#  Successfully updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := test/imp.o
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := test/imp.c src/imp.o
+# automatic
+# | := 
+# automatic
+# < := test/imp.c
+# automatic
+# ^ := test/imp.c src/imp.o
+# automatic
+# ? := test/imp.c src/imp.o
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/17=6%
 #  recipe to execute (from 'Makefile', line 21):
 	@echo "Compilando casos de prueba de lenguaje IMP"
 	@$(CC) $(CFLAGS) $(TESTFLAGS) -o $@ $^
 
 test-imp: test/imp.o
 #  Implicit rule search has not been done.
-#  Implicit/static pattern stem: ''
 #  File does not exist.
 #  File has been updated.
 #  Needs to be updated (-q is set).
-# automatic
-# @ := test-imp
-# automatic
-# % := 
-# automatic
-# * := 
-# automatic
-# + := test/imp.o
-# automatic
-# | := 
-# automatic
-# < := test/imp.o
-# automatic
-# ^ := test/imp.o
-# automatic
-# ? := test/imp.o
 # variable set hash-table stats:
  
-# Load=8/32=25%, Rehash=0, Collisions=1/12=8%
+# Load=0/32=0%, Rehash=0, Collisions=0/7=0%
 #  recipe to execute (from 'Makefile', line 18):
 	@./$<
 
@@ -298,6 +298,6 @@ test-imp: test/imp.o
 # strcache performance: lookups = 42 / hit rate = 38%
 # hash-table stats:
 # Load=26/8192=0%, Rehash=0, Collisions=1/42=2%
-# Finished Make data base on Sun May  1 13:50:00 2022
+# Finished Make data base on Sun May  1 14:35:05 2022
 
  

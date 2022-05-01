@@ -101,14 +101,14 @@ bool a_eval_num() {
 
 bool a_eval_mem() {
     aexp_t *a;
-    mem_t* m = mem_make();
+    memoryadd_t* m = memory_make();
     if(m == NULL) goto fail;
 
     a = aexp_make_mem(aexp_make_num(0));
     check(aexp_eval(a, m) == 0, "Esperaba que x[0] == 0");
     
     aexp_t* val = aexp_make_num(10);
-    mem_assign(m, aexp_index(a), val); 
+    memory_assign(m, aexp_index(a), val); 
     check(aexp_eval(a, m) == 10, "Esperaba que x[0] == 10");
 
     aexp_free(a);
@@ -117,13 +117,13 @@ bool a_eval_mem() {
 
     aexp_free(val);
     aexp_free(a);
-    mem_free(m);
+    memory_free(m);
     return true;
 
  fail:
     aexp_free(a);
     aexp_free(val);
-    mem_free(m);
+    memory_free(m);
     return false;
 }
 
@@ -277,7 +277,6 @@ bool b_make_less() {
                                aexp_make_num(3));
     check(b != NULL, "¿Qué esperabas?");
     check(bexp_is_less(b), "¿Qué esperabas?");
-    /* Terminar prueba */
 
     bexp_free(b);
     return true;
@@ -557,27 +556,27 @@ fail:
 
 ///  PROBANDO MEMORIA
 bool test_mem_assign_and_eval() {
-    mem_t* m = mem_make();
+    memoryadd_t* m = memory_make();
 
     uint64_t n = 100;
     for(uint64_t i = 1; i < n; i += 2) {
         aexp_t* value = aexp_make_num(i);
-        mem_assign(m, value, value);
+        memory_assign(m, value, value);
         aexp_free(value);
     }
 
     for(uint64_t i = 0; i < n; i += 2) {
         aexp_t* value = aexp_make_num(i);
-        mem_assign(m, value, value);
+        memory_assign(m, value, value);
         aexp_free(value);
     }
 
     //This part is for testing if memory locations are being placed in order.
-    //This is because the mem_eval function starts searching in the first value stored
+    //This is because the memory_eval function starts searching in the first value stored
     //and stops if it finds an element with a bigger index than the one that it's looking for.
     for(uint64_t i = 0; i < n; ++i) {
         aexp_t* value = aexp_make_num(i);
-        bool test = i == mem_eval(m, value);
+        bool test = i == memory_eval(m, value);
         aexp_free(value);
         check(test, "Expected equal values.");
     }
@@ -586,29 +585,29 @@ bool test_mem_assign_and_eval() {
     for(uint64_t i = 0; i < n; ++i) {
         aexp_t* value = aexp_make_num(2 * i);
         aexp_t* index = aexp_make_num(i);
-        mem_assign(m, index, value);
+        memory_assign(m, index, value);
         aexp_free(value);
         aexp_free(index);
     }
 
     for(uint64_t i = 0; i < n; ++i) {
         aexp_t* value = aexp_make_num(i);
-        bool test = 2 * i == mem_eval(m, value);
+        bool test = 2 * i == memory_eval(m, value);
         aexp_free(value);
         check(test, "Expected equal values.");
     }
     
     for(uint64_t i = n; i < 2 * n; ++i) {
         aexp_t* value = aexp_make_num(i);
-        bool test = 0 == mem_eval(m, value);
+        bool test = 0 == memory_eval(m, value);
         aexp_free(value);
         check(test, "Expected value 0 on uninitialized position.");
     }
 
-    mem_free(m);
+    memory_free(m);
     return true;
 fail:
-    mem_free(m);
+    memory_free(m);
     return false;
 }
 

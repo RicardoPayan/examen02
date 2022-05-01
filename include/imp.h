@@ -9,11 +9,11 @@
 /* EXPRESIONES ARITMÉTICAS */
 /***************************/
 
-#ifndef MEM_TYPE
-#define MEM_TYPE
+#ifndef MEMORYADD_TYPE
+#define MEMORYADD_TYPE
 
-struct mem_t;
-typedef struct mem_t mem_t;
+struct memoryadd_t;
+typedef struct memoryadd_t memoryadd_t;
 
 #endif
 
@@ -69,7 +69,7 @@ void aexp_free(aexp_t *a);
 /*
   Evaluador de expresiones aritméticas.
  */
-uint64_t aexp_eval(aexp_t *a, mem_t* m);
+uint64_t aexp_eval(aexp_t *a, memoryadd_t* m);
 /*************************/
 /* EXPRESIONES BOOLEANAS */
 /*************************/
@@ -95,11 +95,7 @@ bool bexp_is_or(bexp_t *b);
 bool bexp_is_neg(bexp_t *b);
 
 /*
-  Los siguientes métodos son selectores para acceder a los miembros internos
-  de una expresión booleanas. 
-  bexp_aleft y bexp_aright corresponden a expresiones de tipo igualdad y menor que.
-  bexp_bleft y bexp_bright corresponden a expresiones de tipo AND y OR.
-  bexp_nchild corresponde a una expresión de negación.
+    Pendiente: documentar...
  */
 aexp_t *bexp_aleft(bexp_t *b);
 aexp_t *bexp_aright(bexp_t *b);
@@ -108,10 +104,7 @@ bexp_t *bexp_bright(bexp_t *b);
 bexp_t *bexp_nchild(bexp_t *b);
 
 /*
-  De acuerdo a los posibles tipos de expresiones booleanas:
-  B -> true | false | (A = A) | (A < A) | (B and B) | (B or B) | not B .
-  Se encuentran los constructores para generar expresiones booleanas
-  de cada tipo.
+   Pendiente: documentar...
  */
 bexp_t *bexp_make_true();
 bexp_t *bexp_make_false();
@@ -135,7 +128,7 @@ void bexp_free(bexp_t *b);
  * @param b Expresión booleana por evaluar.
  * @return bool Valor de verdad de la expresión. 
  */
-bool bexp_eval(bexp_t *b, mem_t* m);
+bool bexp_eval(bexp_t *b, memoryadd_t* m);
 
 /***************************/
 /* EXPRESIONES DE PROGRAMA */
@@ -145,13 +138,7 @@ struct pexp_t;
 typedef struct pexp_t pexp_t;
 
 /*
-  P -> skip | x[A]:=A | (P;P) | (while B do P) | if (B then P else P)
-  Una expresión de Programa puede ser skip (una instruccion que no hace algo), 
-  x[A]:=A (asignacion a la memoria), (P;P) (una secuencia de programas),
-  (while B do P) (repeticion) y if (B then P else P) (condicional). 
-  Los siguientes predicados determinan qué tipo de expresión es P.
-  Toda expresión de programa satisface únicamente uno de estos
-  predicados.
+    Pendiente: documentar...
  */
 bool pexp_is_skip(pexp_t *p);
 bool pexp_is_ass(pexp_t *p);
@@ -160,8 +147,7 @@ bool pexp_is_while(pexp_t *p);
 bool pexp_is_if(pexp_t *p);
 
 /*
-  Los siguientes constructores permiten crear una expresion de Programa a partir de
-  expresiones Aritmeticas o Booleanas, asi como expresiones de Programa.
+  Constructores   Pendiente: documentar...
  */
 pexp_t *pexp_make_skip();
 pexp_t *pexp_make_assign(aexp_t *index, aexp_t *rvalue);
@@ -171,12 +157,7 @@ pexp_t *pexp_make_if(bexp_t *conditional, pexp_t *iftrue, pexp_t *ifelse);
 
 
 /*
-  Los siguientes métodos son selectores para acceder a los miembros internos
-  de una expresión de programa. 
-  pexp_pfirst y pexp_psecond corresponden a expresiones de tipo secuencia.
-  pexp_aindex y pexp_arvalue corresponden a expresiones de tipo asignación.
-  pexp_bcondition, pexp_ptrue y pexp_pfalse corresponden a un programa tipo ciclo
-  y las primeras dos a un programa tipo condicional.
+  Selectores   Pendiente: documentar...
  */
 aexp_t *pexp_aindex(pexp_t *p);
 aexp_t *pexp_arvalue(pexp_t *p);
@@ -193,6 +174,6 @@ void pexp_free(pexp_t *p);
 
 //Evaluador
 //falta la memoria
-bool peval(pexp_t *p, mem_t* m);
+bool peval(pexp_t *p, memoryadd_t* m);
 
 #endif  /* ED_IMP_H_ */

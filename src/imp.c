@@ -109,9 +109,9 @@ void aexp_free(aexp_t *a) {
     free(a);
 }
 
-uint64_t aexp_eval(aexp_t *a, mem_t* m) {
+uint64_t aexp_eval(aexp_t *a, memoryadd_t* m) {
     if (aexp_is_num(a)) return aexp_num(a);
-    if (aexp_is_mem(a)) return mem_eval(m, a->index);
+    if (aexp_is_mem(a)) return memory_eval(m, a->index);
 
     uint64_t nleft = aexp_eval(aexp_left(a), m);
     uint64_t nright = aexp_eval(aexp_right(a), m);
@@ -274,7 +274,7 @@ void bexp_free(bexp_t *b) {
     free(b);
 }
 
-bool bexp_eval(bexp_t *b, mem_t* m) {
+bool bexp_eval(bexp_t *b, memoryadd_t* m) {
     if (bexp_is_true(b)) return true;
     if (bexp_is_false(b)) return false;
 
@@ -436,11 +436,11 @@ pexp_t *pexp_make_if(bexp_t *conditional, pexp_t *iftrue, pexp_t *ifelse) {
 
 //EVALUADOR
 //falta la memoria ahi lol
-bool peval (pexp_t *p, mem_t* m)
+bool peval (pexp_t *p, memoryadd_t* m)
 {
     if (pexp_is_ass(p)){
         //FUNCION QUE ASIGNA MEMO
-        if (mem_assign(m, pexp_aindex(p), pexp_arvalue(p)) == NULL) return false;
+        if (memory_assign(m, pexp_aindex(p), pexp_arvalue(p)) == NULL) return false;
     }
     if(pexp_is_seq(p))
     {
