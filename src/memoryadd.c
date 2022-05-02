@@ -7,7 +7,7 @@ struct memoryadd_t {
     uint64_t value;
     uint64_t pos; 
 };
-
+// inicializa la lista ligada de la memoria
 memoryadd_t* memory_make() {
     memoryadd_t* sent = (memoryadd_t*)malloc(sizeof(memoryadd_t));
 
@@ -18,7 +18,8 @@ memoryadd_t* memory_make() {
     
     return sent;
 } 
-
+// busca el nodo con el indice correspondiente (busca un indice que sea menor al que recibio para ordenarla)
+// luego agrega el nodo a la lista ligada, si el indice ya existe reemplaza el valor
 memoryadd_t* memory_assign(memoryadd_t* m, aexp_t* index_exp, aexp_t* value_exp) {
     uint64_t index = aexp_eval(index_exp, m);
     uint64_t value = aexp_eval(value_exp, m); 
@@ -43,7 +44,7 @@ memoryadd_t* memory_assign(memoryadd_t* m, aexp_t* index_exp, aexp_t* value_exp)
 
     return m; 
 }
-
+// Consigue el valor en el indice con el nodo correspondiente
 uint64_t memory_eval(memoryadd_t* m, aexp_t* index_exp) {
     uint64_t index = aexp_eval(index_exp, m);
 
@@ -54,7 +55,7 @@ uint64_t memory_eval(memoryadd_t* m, aexp_t* index_exp) {
 
     return 0;
 }
-
+// Libera la memoria
 void memory_free(memoryadd_t* m) {
     if (m == NULL) return;
 
