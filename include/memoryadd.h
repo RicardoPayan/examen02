@@ -41,15 +41,6 @@ memoryadd_t* memory_assign(memoryadd_t* m, aexp_t* index_exp, aexp_t* value_exp)
  */
 uint64_t memory_eval(memoryadd_t* m, aexp_t* index_exp);
 
-/**
- * @brief Returns the value stored at that index.
- *
- * By default, uninitialized memory locations store the value 0. 
- * @param m Memory list. 
- * @param index uint64_t.   
- * @return uint64_t Value stored at that index. 
- */
-uint64_t memory_eval_num(memoryadd_t* m, uint64_t index);
 
 /**
  * @brief Deletes all data inside the memory list.
