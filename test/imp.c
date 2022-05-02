@@ -614,20 +614,20 @@ fail:
 bool testfactorial(){
     aexp_t* result = aexp_make_mem(aexp_make_num(0)); // cambiar esto
     pexp_t* fact = pexp_make_sequence(
-        pexp_make_assign(aexp_make_num(0), aexp_make_num(1)),
+        pexp_make_assign(aexp_make_num(0), aexp_make_num(1)), // x[0]=1
         pexp_make_while(
-            bexp_make_less(aexp_make_mem(aexp_make_num(1)), 
+            bexp_make_less(aexp_make_mem(aexp_make_num(1)), // x[1]<5
                            aexp_make_num(5)),
             pexp_make_sequence(
-                pexp_make_assign(aexp_make_num(1), aexp_make_add(aexp_make_mem(aexp_make_num(1)), aexp_make_num(1))),
-                pexp_make_assign(aexp_make_num(0), aexp_make_mul(aexp_make_mem(aexp_make_num(0)), aexp_make_mem(aexp_make_num(1))))
+                pexp_make_assign(aexp_make_num(1), aexp_make_add(aexp_make_mem(aexp_make_num(1)), aexp_make_num(1))), //x[1]:=x[1]+1
+                pexp_make_assign(aexp_make_num(0), aexp_make_mul(aexp_make_mem(aexp_make_num(0)), aexp_make_mem(aexp_make_num(1)))) // x[0]:=x[0]*x[1]
             )
         )
     );
     memoryadd_t* m =  memory_make();
-    check(m != NULL, "Mem shouldn't be NULL"); // cambiar esto
-    check(peval(fact, m), "Evaluation of program should be succesful.");// cambiar esto
-    check(aexp_eval(result, m) == 120, "Result should be equal to 120.");// cambiar esto
+    check(m != NULL, "Checar si la memoria no es nula"); // cambiar esto
+    check(peval(fact, m), "Checar si jalo.");// cambiar esto
+    check(aexp_eval(result, m) == 120, "Ver si el resultado es 120");// cambiar esto
     memory_free(m);
     pexp_free(fact);
     aexp_free(result);
