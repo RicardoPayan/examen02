@@ -95,17 +95,18 @@ bool bexp_is_or(bexp_t *b);
 bool bexp_is_neg(bexp_t *b);
 
 /*
-    Pendiente: documentar...
- */
+Sirven para acceder a los componentes de una expresión booleana segun su tipo
+*/
 aexp_t *bexp_aleft(bexp_t *b);
 aexp_t *bexp_aright(bexp_t *b);
 bexp_t *bexp_bleft(bexp_t *b);
 bexp_t *bexp_bright(bexp_t *b);
 bexp_t *bexp_nchild(bexp_t *b);
 
-/*
-   Pendiente: documentar...
- */
+/* 
+Constructores de cada tipo de expresiones booleanas
+*/
+
 bexp_t *bexp_make_true();
 bexp_t *bexp_make_false();
 bexp_t *bexp_make_equal(aexp_t *left, aexp_t *right);
@@ -138,8 +139,11 @@ struct pexp_t;
 typedef struct pexp_t pexp_t;
 
 /*
-    Pendiente: documentar...
- */
+ENUNCIADOS:
+Se elige cual es la expresión de P mas adecuada para el programa a partir de la siguientes reglas gramaticales:
+
+P-> skip | x[A]:=A | (P;P)|(while B do P)|(if B then P else P)
+*/
 bool pexp_is_skip(pexp_t *p);
 bool pexp_is_ass(pexp_t *p);
 bool pexp_is_seq(pexp_t *p) ;
@@ -147,18 +151,19 @@ bool pexp_is_while(pexp_t *p);
 bool pexp_is_if(pexp_t *p);
 
 /*
-  Constructores   Pendiente: documentar...
- */
+CONSTRUCTORES:
+Utilizando las mismas reglas gramaticales de P comentadas anteriormente, Estos constructores determinan y crean los enunciados de P
+*/
 pexp_t *pexp_make_skip();
 pexp_t *pexp_make_assign(aexp_t *index, aexp_t *rvalue);
 pexp_t *pexp_make_sequence(pexp_t *pfirst, pexp_t *psecond);
 pexp_t *pexp_make_while(bexp_t *condition, pexp_t *ptrue);
 pexp_t *pexp_make_if(bexp_t *conditional, pexp_t *iftrue, pexp_t *ifelse);
 
-
 /*
-  Selectores   Pendiente: documentar...
- */
+SELECTORES:
+Sirven para acceder a los componentes de un programa
+*/
 aexp_t *pexp_aindex(pexp_t *p);
 aexp_t *pexp_arvalue(pexp_t *p);
 pexp_t *pexp_psecond(pexp_t *p);
@@ -169,11 +174,21 @@ pexp_t *pexp_pfalse(pexp_t *p);
 pexp_t *pexp_iftrue(pexp_t *p);
 pexp_t *pexp_ifelse(pexp_t *p);
 bexp_t *pexp_bconditional(pexp_t *p);
-// Destructor
+//DESTRUCTOR >:(
+/**
+* @brief Libera la memoria de un programa P
+* @param p el programa del cual se desea liberar memoria.
+*/
 void pexp_free(pexp_t *p);
 
-//Evaluador
-//falta la memoria
+//EVALUADOR :)
+/*
+* @brief Evalúa los procesos de un programa y su utilización de memoria
+* @param p Programa que se evaluará
+* @param m Memoria del programa
+* @return true En caso que el funcionamiento sea correcto
+* @return false En caso de alguna falla
+*/
 bool peval(pexp_t *p, memoryadd_t* m);
 
 #endif  /* ED_IMP_H_ */

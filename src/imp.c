@@ -1,5 +1,6 @@
 #include <memoryadd.h>
 #include <imp.h>
+#include <stdio.h>
 /***************************/
 /* EXPRESIONES ARITMÉTICAS */
 /***************************/
@@ -20,7 +21,7 @@ typedef struct aexp_t {
             struct aexp_t *left;
             struct aexp_t *right;
         };
-        aexp_t* index;
+        struct aexp_t* index;
     };
 } aexp_t;
 
@@ -101,8 +102,12 @@ aexp_t *aexp_make_mul(aexp_t *left, aexp_t *right) {
 
 void aexp_free(aexp_t *a) {
     if (a == NULL) return;
-    
-    if (!aexp_is_num(a)) {
+
+    if (aexp_is_mem(a)) {
+        aexp_free(aexp_index(a));
+    }
+
+    if (!aexp_is_num(a) && !aexp_is_mem(a)) {
         aexp_free(aexp_left(a));
         aexp_free(aexp_right(a));
     }
@@ -251,10 +256,13 @@ bexp_t *bexp_make_neg(bexp_t *child) {
 }
 
 void bexp_free(bexp_t *b) {
-    if (b == NULL) return;
-
-    if (bexp_is_true(b) || bexp_is_false(b))
+    if (b == NULL) {
         return;
+    }
+
+    if (bexp_is_true(b) || bexp_is_false(b)) {
+        return;
+    }
 
     if (bexp_is_equal(b) || bexp_is_less(b)) {
         aexp_free(bexp_aleft(b));
@@ -269,7 +277,6 @@ void bexp_free(bexp_t *b) {
         free(b);
         return;
     }
-
     bexp_free(bexp_nchild(b));
     free(b);
 }
@@ -367,7 +374,6 @@ pexp_t *pexp_psecond(pexp_t *p){
 }
 
 bexp_t *pexp_bcondition(pexp_t *p){
-    if (p->type!=PEXP_WHL&&p->type!=PEXP_IFS) return NULL;
     return p->condition;
 }
 pexp_t *pexp_ptrue(pexp_t *p){
@@ -465,7 +471,9 @@ bool peval (pexp_t *p, memoryadd_t* m)
 }
 
 void pexp_free(pexp_t *p) {
-    if (p == NULL) return;
+    if (p == NULL) {
+        return;
+    }
 
     if (pexp_is_seq(p)) {
         pexp_free(pexp_pfirst(p));
@@ -496,5 +504,9 @@ void pexp_free(pexp_t *p) {
         return;
     }
 
+    if (pexp_is_skip(p)) {
+        free(p);
+        return;
+    }
     free(p);
 }

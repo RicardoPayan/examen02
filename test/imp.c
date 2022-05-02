@@ -1,6 +1,7 @@
 #include <imp.h>
 #include <memoryadd.h>
 #include <tests.h>
+#include <stdint.h>
 
 bool a_make_num() {
     aexp_t *a = aexp_make_num(666);
@@ -610,6 +611,33 @@ fail:
     memory_free(m);
     return false;
 }
+bool testfactorial(){
+    aexp_t* result = aexp_make_mem(aexp_make_num(0)); // cambiar esto
+    pexp_t* fact = pexp_make_sequence(
+        pexp_make_assign(aexp_make_num(0), aexp_make_num(1)),
+        pexp_make_while(
+            bexp_make_less(aexp_make_mem(aexp_make_num(1)), 
+                           aexp_make_num(5)),
+            pexp_make_sequence(
+                pexp_make_assign(aexp_make_num(1), aexp_make_add(aexp_make_mem(aexp_make_num(1)), aexp_make_num(1))),
+                pexp_make_assign(aexp_make_num(0), aexp_make_mul(aexp_make_mem(aexp_make_num(0)), aexp_make_mem(aexp_make_num(1))))
+            )
+        )
+    );
+    memoryadd_t* m =  memory_make();
+    check(m != NULL, "Mem shouldn't be NULL"); // cambiar esto
+    check(peval(fact, m), "Evaluation of program should be succesful.");// cambiar esto
+    check(aexp_eval(result, m) == 120, "Result should be equal to 120.");// cambiar esto
+    memory_free(m);
+    pexp_free(fact);
+    aexp_free(result);
+    return true;
+fail:
+    memory_free(m);
+    pexp_free(fact);
+    aexp_free(result);
+    return false;
+}
 
 int main() {
     fprintf(stderr, "==|PROBANDO EXPRESIONES ARITMETICAS|==\n");
@@ -642,4 +670,5 @@ int main() {
     run_test(p_make_sequence);
     run_test(p_make_while);
     run_test(p_make_if);
+    run_test(testfactorial);
 }

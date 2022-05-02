@@ -57,5 +57,5 @@ uint64_t memory_eval_num(memoryadd_t* m, uint64_t index);
  * @param m Memory list to be freed. 
  */
 void memory_free(memoryadd_t* m);
-
+void memory_print(memoryadd_t* m);
 #endif
